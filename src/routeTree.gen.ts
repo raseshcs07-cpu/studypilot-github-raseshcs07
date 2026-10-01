@@ -14,6 +14,9 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedExamsRouteImport } from './routes/_authenticated/exams'
+import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
+import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSubjectsRouteImport } from './routes/_authenticated/subjects'
 
 const IndexRoute = IndexRouteImport.update({
@@ -40,6 +43,21 @@ const AuthenticatedExamsRoute = AuthenticatedExamsRouteImport.update({
   path: '/exams',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSubjectsRoute = AuthenticatedSubjectsRouteImport.update({
   id: '/subjects',
   path: '/subjects',
@@ -51,6 +69,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exams': typeof AuthenticatedExamsRoute
+  '/planner': typeof AuthenticatedPlannerRoute
+  '/schedule': typeof AuthenticatedScheduleRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/subjects': typeof AuthenticatedSubjectsRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +79,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exams': typeof AuthenticatedExamsRoute
+  '/planner': typeof AuthenticatedPlannerRoute
+  '/schedule': typeof AuthenticatedScheduleRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/subjects': typeof AuthenticatedSubjectsRoute
 }
 export interface FileRoutesById {
@@ -67,13 +91,32 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exams': typeof AuthenticatedExamsRoute
+  '/_authenticated/planner': typeof AuthenticatedPlannerRoute
+  '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/subjects': typeof AuthenticatedSubjectsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/exams' | '/subjects'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/exams'
+    | '/planner'
+    | '/schedule'
+    | '/settings'
+    | '/subjects'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/exams' | '/subjects'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/exams'
+    | '/planner'
+    | '/schedule'
+    | '/settings'
+    | '/subjects'
   id:
     | '__root__'
     | '/'
@@ -81,6 +124,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/_authenticated/exams'
+    | '/_authenticated/planner'
+    | '/_authenticated/schedule'
+    | '/_authenticated/settings'
     | '/_authenticated/subjects'
   fileRoutesById: FileRoutesById
 }
@@ -127,6 +173,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExamsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/planner': {
+      id: '/_authenticated/planner'
+      path: '/planner'
+      fullPath: '/planner'
+      preLoaderRoute: typeof AuthenticatedPlannerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/schedule': {
+      id: '/_authenticated/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof AuthenticatedScheduleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/subjects': {
       id: '/_authenticated/subjects'
       path: '/subjects'
@@ -140,12 +207,18 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExamsRoute: typeof AuthenticatedExamsRoute
+  AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
+  AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSubjectsRoute: typeof AuthenticatedSubjectsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExamsRoute: AuthenticatedExamsRoute,
+  AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
+  AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSubjectsRoute: AuthenticatedSubjectsRoute,
 }
 
