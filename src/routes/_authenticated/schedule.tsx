@@ -89,8 +89,14 @@ function SchedulePage() {
   };
 
   const addSession = async () => {
-    if (!addOpen || !addForm.subject_id) return toast.error("Choose a subject");
-    if (addForm.end_time <= addForm.start_time) return toast.error("End time must be after start time");
+    if (!addOpen || !addForm.subject_id) {
+      toast.error("Choose a subject");
+      return;
+    }
+    if (addForm.end_time <= addForm.start_time) {
+      toast.error("End time must be after start time");
+      return;
+    }
     const { data: session } = await supabase.auth.getSession();
     const userId = session.session?.user.id;
     if (!userId) return;

@@ -52,7 +52,7 @@ function PlannerPage() {
   const generate = async () => {
     setPlanning(true);
     try {
-      const result = await runPlan({ data: {} });
+      const result = await runPlan({ data: undefined });
       toast.success(`Plan generated — ${result.created} sessions scheduled`);
       qc.invalidateQueries({ queryKey: ["sessions"] });
     } catch (err) {
@@ -63,7 +63,10 @@ function PlannerPage() {
   };
 
   const explain = async () => {
-    if (!explainTarget) return toast.error("Pick a subject or topic first");
+    if (!explainTarget) {
+      toast.error("Pick a subject or topic first");
+      return;
+    }
     setExplaining(true);
     setExplanation(null);
     try {

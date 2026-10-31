@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/subjects")({
   component: SubjectsPage,
 });
 
-const emptyForm = { name: "", color: SUBJECT_COLORS[0], difficulty: 3, priority: 3, basics_level: "beginner" as Subject["basics_level"] };
+const emptyForm: { name: string; color: string; difficulty: number; priority: number; basics_level: Subject["basics_level"] } = { name: "", color: SUBJECT_COLORS[0], difficulty: 3, priority: 3, basics_level: "beginner" };
 
 function SubjectsPage() {
   const qc = useQueryClient();
