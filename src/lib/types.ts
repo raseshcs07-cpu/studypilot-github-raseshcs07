@@ -62,7 +62,7 @@ export const SUBJECT_COLORS = [
   "#ec4899",
   "#14b8a6",
   "#f97316",
-];
+] as const;
 
 export const DAYS = [
   "monday",
