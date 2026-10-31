@@ -13,6 +13,7 @@ import {
   BookOpenCheck,
   Menu,
   X,
+  CircleHelp,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,6 +28,7 @@ const NAV = [
   { to: "/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/planner", label: "AI Planner", icon: Sparkles },
   { to: "/settings", label: "Settings", icon: SettingsIcon },
+  { to: "/help", label: "How to use", icon: CircleHelp },
 ] as const;
 
 function AuthenticatedLayout() {
