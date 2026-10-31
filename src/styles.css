@@ -100,20 +100,24 @@
 }
 
 @layer components {
-  .btn {
+  .btn,
+  .btn-primary,
+  .btn-outline,
+  .btn-ghost,
+  .btn-danger {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
   }
   .btn-primary {
-    @apply btn bg-primary text-primary-foreground hover:opacity-90;
+    @apply bg-primary text-primary-foreground hover:opacity-90;
   }
   .btn-outline {
-    @apply btn border border-border bg-card text-foreground hover:bg-muted;
+    @apply border border-border bg-card text-foreground hover:bg-muted;
   }
   .btn-ghost {
-    @apply btn text-muted-foreground hover:bg-muted hover:text-foreground;
+    @apply text-muted-foreground hover:bg-muted hover:text-foreground;
   }
   .btn-danger {
-    @apply btn bg-destructive text-destructive-foreground hover:opacity-90;
+    @apply bg-destructive text-destructive-foreground hover:opacity-90;
   }
   .card {
     @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
