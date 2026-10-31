@@ -35,9 +35,18 @@ function ExamsPage() {
   const subjectMap = new Map(subjects.map((s) => [s.id, s]));
 
   const save = async () => {
-    if (!form.subject_id) return toast.error("Choose a subject");
-    if (!form.exam_date) return toast.error("Pick an exam date");
-    if (form.exam_date < todayStr()) return toast.error("Exam date must be in the future");
+    if (!form.subject_id) {
+      toast.error("Choose a subject");
+      return;
+    }
+    if (!form.exam_date) {
+      toast.error("Pick an exam date");
+      return;
+    }
+    if (form.exam_date < todayStr()) {
+      toast.error("Exam date must be in the future");
+      return;
+    }
     setSaving(true);
     try {
       const { data: session } = await supabase.auth.getSession();
@@ -86,8 +95,11 @@ function ExamsPage() {
         <h1 className="text-2xl font-bold text-foreground">Exams</h1>
         <button
           onClick={() => {
-            if (!subjects.length) return toast.error("Add a subject first");
-            setForm((f) => ({ ...f, subject_id: f.subject_id || subjects[0].id }));
+            if (!subjects.length) {
+              toast.error("Add a subject first");
+              return;
+            }
+            setForm((f) => ({ ...f, subject_id: f.subject_id || subjects[0]?.id || "" }));
             setOpen(true);
           }}
           className="btn-primary"

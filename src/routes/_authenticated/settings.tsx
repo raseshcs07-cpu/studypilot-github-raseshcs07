@@ -36,7 +36,10 @@ function SettingsPage() {
   }, [profile]);
 
   const save = async () => {
-    if (hours < 0.5 || hours > 16) return toast.error("Daily hours must be between 0.5 and 16");
+    if (hours < 0.5 || hours > 16) {
+      toast.error("Daily hours must be between 0.5 and 16");
+      return;
+    }
     if (!profile) return;
     setSaving(true);
     try {
