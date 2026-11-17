@@ -14,6 +14,208 @@ export type Database = {
   }
   public: {
     Tables: {
+      assignment_submissions: {
+        Row: {
+          assignment_id: string
+          content: string
+          feedback: string
+          grade: number | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          student_id: string
+          submitted_at: string
+        }
+        Insert: {
+          assignment_id: string
+          content?: string
+          feedback?: string
+          grade?: number | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          student_id: string
+          submitted_at?: string
+        }
+        Update: {
+          assignment_id?: string
+          content?: string
+          feedback?: string
+          grade?: number | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          student_id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "class_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_records: {
+        Row: {
+          attendance_date: string
+          created_at: string
+          id: string
+          note: string
+          status: string
+          student_id: string
+          teacher_id: string
+        }
+        Insert: {
+          attendance_date?: string
+          created_at?: string
+          id?: string
+          note?: string
+          status: string
+          student_id: string
+          teacher_id: string
+        }
+        Update: {
+          attendance_date?: string
+          created_at?: string
+          id?: string
+          note?: string
+          status?: string
+          student_id?: string
+          teacher_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          is_pinned: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      class_assignments: {
+        Row: {
+          created_at: string
+          due_date: string | null
+          id: string
+          instructions: string
+          published: boolean
+          subject: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          instructions?: string
+          published?: boolean
+          subject?: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          instructions?: string
+          published?: boolean
+          subject?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      class_resources: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          published: boolean
+          resource_type: string
+          subject: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          resource_type: string
+          subject?: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          resource_type?: string
+          subject?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       exams: {
         Row: {
           created_at: string
@@ -57,24 +259,30 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_email: string | null
           created_at: string
           daily_study_hours: number
+          display_name: string | null
           id: string
           preferred_time: string
           user_id: string
           weekly_off_day: string
         }
         Insert: {
+          account_email?: string | null
           created_at?: string
           daily_study_hours?: number
+          display_name?: string | null
           id?: string
           preferred_time?: string
           user_id: string
           weekly_off_day?: string
         }
         Update: {
+          account_email?: string | null
           created_at?: string
           daily_study_hours?: number
+          display_name?: string | null
           id?: string
           preferred_time?: string
           user_id?: string
@@ -169,6 +377,30 @@ export type Database = {
         }
         Relationships: []
       }
+      teacher_students: {
+        Row: {
+          assigned_by: string
+          created_at: string
+          id: string
+          student_id: string
+          teacher_id: string
+        }
+        Insert: {
+          assigned_by: string
+          created_at?: string
+          id?: string
+          student_id: string
+          teacher_id: string
+        }
+        Update: {
+          assigned_by?: string
+          created_at?: string
+          id?: string
+          student_id?: string
+          teacher_id?: string
+        }
+        Relationships: []
+      }
       topics: {
         Row: {
           created_at: string
@@ -210,15 +442,51 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_assigned_teacher: {
+        Args: { _student_id: string; _teacher_id: string }
+        Returns: boolean
+      }
+      is_assignment_teacher: {
+        Args: { _assignment_id: string }
+        Returns: boolean
+      }
+      is_class_teacher: { Args: { _teacher_id: string }; Returns: boolean }
+      is_resource_visible: { Args: { _resource_id: string }; Returns: boolean }
+      is_school_admin: { Args: never; Returns: boolean }
+      is_school_owner: { Args: never; Returns: boolean }
+      is_student_assigned_to_assignment: {
+        Args: { _assignment_id: string; _student_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "school_admin" | "teacher" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -345,6 +613,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "school_admin", "teacher", "student"],
+    },
   },
 } as const
