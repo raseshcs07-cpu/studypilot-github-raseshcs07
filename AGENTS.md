@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+Use account-owned assistant threads with route-stable IDs, and enforce classroom access through separately stored roles and admin-controlled teacher/student links to prevent cross-account data leaks.

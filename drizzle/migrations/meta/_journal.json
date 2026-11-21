@@ -8,6 +8,13 @@
       "when": 1794909168102,
       "tag": "0000_school_classrooms_and_private_chats",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795245189279,
+      "tag": "0001_school_reservations_and_profile_access",
+      "breakpoints": true
     }
   ]
 }

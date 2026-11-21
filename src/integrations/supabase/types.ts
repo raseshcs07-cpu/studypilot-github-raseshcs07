@@ -290,6 +290,86 @@ export type Database = {
         }
         Relationships: []
       }
+      reservable_resources: {
+        Row: {
+          category: string
+          created_at: string
+          details: string
+          id: string
+          is_available: boolean
+          location: string
+          name: string
+          teacher_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          details?: string
+          id?: string
+          is_available?: boolean
+          location?: string
+          name: string
+          teacher_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          details?: string
+          id?: string
+          is_available?: boolean
+          location?: string
+          name?: string
+          teacher_id?: string
+        }
+        Relationships: []
+      }
+      resource_reservations: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          note: string
+          resource_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          starts_at: string
+          status: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          note?: string
+          resource_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          starts_at: string
+          status?: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          note?: string
+          resource_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          starts_at?: string
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_reservations_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "reservable_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       study_sessions: {
         Row: {
           created_at: string
@@ -468,6 +548,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_review_reservation: {
+        Args: { _reservation_id: string }
+        Returns: boolean
+      }
+      can_student_reserve_resource: {
+        Args: { _resource_id: string }
+        Returns: boolean
+      }
       is_assigned_teacher: {
         Args: { _student_id: string; _teacher_id: string }
         Returns: boolean
@@ -477,6 +565,7 @@ export type Database = {
         Returns: boolean
       }
       is_class_teacher: { Args: { _teacher_id: string }; Returns: boolean }
+      is_related_school_user: { Args: { _user_id: string }; Returns: boolean }
       is_resource_visible: { Args: { _resource_id: string }; Returns: boolean }
       is_school_admin: { Args: never; Returns: boolean }
       is_school_owner: { Args: never; Returns: boolean }

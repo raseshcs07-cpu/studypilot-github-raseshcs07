@@ -1,66 +1,43 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { GatewayError, generateResponse } from "@lovable.dev/ai-gateway";
+import { fillPlanCoverage } from "@/lib/plan-coverage";
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
 async function callAI(messages: ChatMessage[], effort: "low" | "medium" = "low"): Promise<string> {
-  const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) throw new Error("AI is not configured on the server");
+  const instructions = messages.find((message) => message.role === "system")?.content;
+  const input = messages
+    .filter((message) => message.role !== "system")
+    .map(({ role, content }) => ({ role, content }));
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "Lovable-API-Key": apiKey,
-      "X-Lovable-AIG-SDK": "fetch",
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-6-astra",
-      input: messages.map((m) => ({ role: m.role, content: m.content })),
-      reasoning: { effort },
-      store: false,
-      stream: true,
-    }),
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    if (res.status === 429) throw new Error("AI is busy right now. Please try again in a minute.");
-    if (res.status === 402) throw new Error("AI credits are exhausted. Please add credits to continue.");
-    throw new Error(`AI request failed (${res.status}): ${text.slice(0, 200)}`);
+  try {
+    const response = await generateResponse(
+      {
+        model: "openai/gpt-6-astra",
+        instructions,
+        input,
+        reasoning: { effort },
+      },
+      { runId: crypto.randomUUID() },
+    );
+    if (response.status !== "completed") throw new Error("AI did not finish its response.");
+    const output = response.output
+      .filter((item) => item.type === "message")
+      .flatMap((item) => item.content)
+      .filter((part) => part.type === "output_text")
+      .map((part) => part.text)
+      .join("\n");
+    if (!output.trim()) throw new Error("AI returned an empty response. Please try again.");
+    return output;
+  } catch (error) {
+    if (!(error instanceof GatewayError)) throw error;
+    if (error.code === "payment_required") throw new Error("AI credits are exhausted. Please add credits to continue.");
+    if (error.code === "rate_limited") throw new Error("AI is busy right now. Please try again in a minute.");
+    if (error.code === "permission_denied") throw new Error("AI access is currently unavailable for this request.");
+    throw new Error("StudyPilot could not finish this request. Please try again later.");
   }
-
-  const reader = res.body!.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  let output = "";
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    let idx: number;
-    while ((idx = buffer.indexOf("\n\n")) >= 0) {
-      const frame = buffer.slice(0, idx);
-      buffer = buffer.slice(idx + 2);
-      for (const line of frame.split("\n")) {
-        if (!line.startsWith("data:")) continue;
-        const data = line.slice(5).trim();
-        if (!data || data === "[DONE]") continue;
-        try {
-          const ev = JSON.parse(data);
-          if (ev.type === "response.output_text.delta" && typeof ev.delta === "string") {
-            output += ev.delta;
-          }
-        } catch {
-          // ignore partial frames
-        }
-      }
-    }
-  }
-  if (!output) throw new Error("AI returned an empty response. Please try again.");
-  return output;
 }
 
 function extractJson<T>(text: string): T {
@@ -131,11 +108,12 @@ ${exams.map((e: any) => `- subj ${e.subject_id} | ${e.type} | ${e.exam_date} | s
 
 Rules:
 1. Cover topics with is_basic=true and status != done FIRST, before advanced topics.
-2. Give higher difficulty and higher priority subjects more total time.
+2. Plan across ALL subjects; do not spend the plan on a single subject. Give every subject with unfinished topics at least one session, then distribute remaining time by difficulty and priority.
 3. In the 3 days before each exam, schedule revision sessions for that subject (notes starting with "Revision:").
 4. Never schedule on the weekly off day. Never exceed daily study hours per day.
 5. Session length 1-2 hours. Times in 24h HH:MM, aligned to the preferred time block.
-6. Only use subject_id and topic_id values from the lists above. topic_id may be null for revision sessions.
+6. Give every upcoming exam in the 14-day window a revision session during the 3 days before it. Do not omit an exam because another subject is higher priority.
+7. Only use subject_id and topic_id values from the lists above. topic_id may be null for revision sessions.
 
 Return ONLY a JSON array, no prose:
 [{"date":"YYYY-MM-DD","start_time":"HH:MM","end_time":"HH:MM","subject_id":"...","topic_id":"...or null","notes":"short goal"}]`;
@@ -175,7 +153,17 @@ Return ONLY a JSON array, no prose:
         notes: typeof r.notes === "string" ? r.notes.slice(0, 300) : "",
       }));
 
-    if (!rows.length) throw new Error("AI could not build a plan from your data. Add topics and try again.");
+    const coveredRows = fillPlanCoverage({
+      proposed: rows,
+      subjects,
+      topics,
+      exams,
+      today,
+      weeklyOffDay: profile?.weekly_off_day ?? "sunday",
+      dailyStudyHours: Number(profile?.daily_study_hours ?? 2),
+      preferredTime: profile?.preferred_time ?? "evening",
+    });
+    if (!coveredRows.length) throw new Error("AI could not build a plan from your data. Add topics and try again.");
 
     // Replace future planned sessions with the new plan
     await supabase
@@ -185,10 +173,10 @@ Return ONLY a JSON array, no prose:
       .eq("status", "planned")
       .gte("date", today);
 
-    const { error } = await supabase.from("study_sessions").insert(rows);
+    const { error } = await supabase.from("study_sessions").insert(coveredRows.map((row) => ({ ...row, user_id: userId })));
     if (error) throw error;
 
-    return { created: rows.length };
+    return { created: coveredRows.length };
   });
 
 export const explainBasics = createServerFn({ method: "POST" })
